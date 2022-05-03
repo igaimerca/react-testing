@@ -1,13 +1,52 @@
-
-import React from 'react';
+import axios from "axios";
+import React, { useState } from "react";
 
 const Login = () => {
+    const [error, setError] = useState(false);
+    const [password, setPassword] = useState("");
+    const [username, setUsername] = useState("");
+    const [user, setUser] = useState({});
+    const [loading, setLoading] = useState(false);
+
+    const handleClick = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const { data } = await axios.get("https://jsonplaceholder.typicode.com/users/1");
+            setUser(data);
+        } catch (error) {
+            setError(true);
+        }finally {
+            setLoading(false);
+        }
+
+    }
     return (
         <div className="container">
+            <span className="user">{user.name}</span>
             <form>
-                <input type="text" />
-                <input type="password" autoComplete='off' />
-                <button>Login</button>
+                <input
+                    type="text"
+                    placeholder="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                />
+                <input
+                    type="password"
+                    autoComplete="off"
+                    placeholder="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <button onClick={handleClick} disabled={!username || !password}>
+                    {loading ? "please wait" : "Login"}
+                </button>
+                <span
+                    data-testid="error"
+                    style={{ visibility: error ? "visible" : "hidden" }}
+                >
+                    something went wrong
+                </span>
             </form>
         </div>
     );
